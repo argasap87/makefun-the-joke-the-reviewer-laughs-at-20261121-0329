@@ -10,9 +10,15 @@ import os
 JOKE = "My agent fixed all our failing tests in one diff \u2014 it changed every assertion to `toBeDefined()`."
 
 def main() -> None:
+    # Gate the entry ourselves: the sealed scorer rejects anything outside
+    # 1-280 code points or more than one line, so fail loudly here rather
+    # than submit an invalid file.
+    text = JOKE.strip()
+    if not text or len(text) > 280 or "\n" in text:
+        raise SystemExit(f"joke fails the gate: {len(text)} chars, {text.count(chr(10)) + 1} lines")
     os.makedirs("/output", exist_ok=True)
     with open("/output/entry.txt", "w", encoding="utf-8") as f:
-        f.write(JOKE)
+        f.write(text)
 
 if __name__ == "__main__":
     main()
